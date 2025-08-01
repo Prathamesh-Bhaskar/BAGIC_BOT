@@ -17,12 +17,12 @@ class TravelChatbot:
     def __init__(self, rag_system):
         self.rag_system = rag_system
         
-        # Azure OpenAI Configuration (using the same configuration as RAG)
-        self.AZURE_ENDPOINT = ""
-        self.AZURE_MODEL_NAME = ""
-        self.AZURE_DEPLOYMENT = ""
-        self.AZURE_API_KEY = ""
-        self.AZURE_API_VERSION = ""
+        # Azure OpenAI Configuration from environment variables
+        self.AZURE_ENDPOINT = os.environ.get("AZURE_ENDPOINT", "")
+        self.AZURE_MODEL_NAME = os.environ.get("AZURE_MODEL_NAME", "")
+        self.AZURE_DEPLOYMENT = os.environ.get("AZURE_DEPLOYMENT", "")
+        self.AZURE_API_KEY = os.environ.get("AZURE_API_KEY", "")
+        self.AZURE_API_VERSION = os.environ.get("AZURE_API_VERSION", "")
         
         # Initialize chat model
         self.llm = AzureChatOpenAI(
