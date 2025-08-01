@@ -4,3 +4,7 @@ langchain_openai
 langchain_docling
 pypdf
 flask
+faiss-cpu
+python-dotenv
+astrapy
+gunicorn
