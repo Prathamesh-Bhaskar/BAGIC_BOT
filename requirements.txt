@@ -1,0 +1,6 @@
+langchain_astradb
+langchain_huggingface
+langchain_openai
+langchain_docling
+pypdf
+flask

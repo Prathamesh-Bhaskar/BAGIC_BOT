@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travel Insurance RAG System</title>
+    <!-- Add Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 300;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .main-content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+      }
+
+      .section h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+      }
+
+      .plans-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+
+      .plan-input-group {
+        margin-bottom: 20px;
+      }
+
+      .plan-input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .plan-input:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      .plan-suggestions {
+        background: white;
+        border: 1px solid #e1e8ed;
+        border-radius: 8px;
+        margin-top: 10px;
+        display: none;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .plan-suggestion {
+        padding: 12px 15px;
+        border-bottom: 1px solid #f1f3f4;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .plan-suggestion:hover {
+        background-color: #f8f9fa;
+      }
+
+      .plan-suggestion:last-child {
+        border-bottom: none;
+      }
+
+      .selected-plan-info {
+        background: linear-gradient(145deg, #e8f5e8, #ffffff);
+        border: 2px solid #27ae60;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        display: none;
+      }
+
+      .selected-plan-info.show {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .plan-details {
+        line-height: 1.6;
+        color: #2c3e50;
+      }
+
+      .query-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 30px;
+        display: none;
+      }
+
+      .query-section.show {
+        display: block;
+      }
+
+      .query-input-group {
+        margin-bottom: 20px;
+      }
+
+      .query-input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        font-size: 2rem;
+        transition: border-color 0.3s ease;
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .query-input:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+      }
+
+      .btn:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      }
+
+      .btn-secondary:hover {
+        box-shadow: 0 8px 20px rgba(149, 165, 166, 0.3);
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #27ae60, #219a52);
+      }
+
+      .btn-success:hover {
+        box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+      }
+
+      .answer-section {
+        background: white;
+        border: 2px solid #3498db;
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 20px;
+        display: none;
+      }
+
+      .answer-section.show {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      .answer-text {
+        line-height: 1.6;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-size: 1.05rem;
+        white-space: pre-wrap;
+      }
+
+      .sources {
+        border-top: 1px solid #e1e8ed;
+        padding-top: 20px;
+      }
+
+      .sources h4 {
+        color: #7f8c8d;
+        margin-bottom: 15px;
+        font-size: 1rem;
+      }
+
+      .source-item {
+        background: #f8f9fa;
+        border-left: 4px solid #3498db;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 0 8px 8px 0;
+      }
+
+      .source-meta {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 8px;
+      }
+
+      .source-content {
+        font-size: 0.9rem;
+        color: #555;
+        font-style: italic;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .loading.show {
+        display: block;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error {
+        background: #e74c3c;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: none;
+      }
+
+      .error.show {
+        display: block;
+      }
+
+      .success {
+        background: #27ae60;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: none;
+      }
+
+      .success.show {
+        display: block;
+      }
+
+      .available-plans {
+        background: white;
+        border: 1px solid #e1e8ed;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .quick-questions {
+        background: #f1f8ff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .quick-questions h4 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+
+      .quick-question-btn {
+        background: #ecf0f1;
+        border: 1px solid #bdc3c7;
+        padding: 8px 15px;
+        margin: 5px;
+        border-radius: 20px;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      }
+
+      .quick-question-btn:hover {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+          border-radius: 10px;
+        }
+
+        .header {
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .main-content {
+          padding: 20px;
+        }
+
+        .btn {
+          margin-right: 0;
+          margin-bottom: 10px;
+          width: 100%;
+        }
+      }
+
+      /* Improved Chatbot Styles */
+      .chatbot-icon {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 9999; /* Ensure it's above everything else */
+        transition: all 0.3s ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent; /* Remove highlight on mobile */
+      }
+
+      .chatbot-icon:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+      }
+
+      .chatbot-icon i {
+        color: white;
+        font-size: 24px;
+        pointer-events: none; /* Make sure clicks pass through to the parent */
+      }
+
+      .chat-popup {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 550px;
+        height: 700px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 9998; /* High z-index but below the icon */
+        transition: all 0.3s ease;
+        display: none;
+      }
+
+      .chat-popup.show {
+        display: flex;
+      }
+
+      .chat-header {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .chat-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .chat-close {
+        color: white;
+        cursor: pointer;
+        font-size: 2.5rem;
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .message {
+        max-width: 80%;
+        padding: 12px 15px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+
+      .bot-message {
+        background: #f1f0f0;
+        color: #333;
+        align-self: flex-start;
+        border-bottom-left-radius: 5px;
+      }
+      
+      .plan-details-card {
+        background: linear-gradient(145deg, #ffffff, #f5f9ff);
+        border: 2px solid #3498db;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 10px 0;
+        width: 95%;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
+      }
+
+      .plan-details-card h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e1f0fa;
+        font-size: 1.2rem;
+      }
+      
+      .plan-details-card .detail-item {
+        margin-bottom: 10px;
+        padding: 5px 8px;
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: 6px;
+      }
+      
+      .plan-details-card .detail-category {
+        font-weight: 600;
+        color: #2980b9;
+        display: block;
+        margin-bottom: 3px;
+      }
+      
+      .plan-details-card .detail-value {
+        color: #34495e;
+      }
+      
+      /* Alternative Plans Card Styling */
+      .alternative-plans-card {
+        background: linear-gradient(145deg, #fff8f8, #fff);
+        border: 2px solid #3498db;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 10px 0;
+        width: 95%;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
+        align-self: flex-start;
+      }
+      
+      .alternative-plans-card .plans-intro {
+        color: #34495e;
+        margin-bottom: 15px;
+        line-height: 1.5;
+      }
+      
+      .alternative-plans-card .plans-list {
+        border-top: 1px solid #f2d7d5;
+        padding-top: 12px;
+        margin-top: 12px;
+      }
+      
+      .alternative-plans-card .plan-option {
+        background: rgba(255, 255, 255, 0.7);
+        border-left: 3px solid #3498db;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        border-radius: 0 6px 6px 0;
+      }
+      
+      .alternative-plans-card .plan-name {
+        font-weight: 600;
+        color: #3498db;
+      }
+      
+      .alternative-plans-card .plan-details {
+        color: #34495e;
+        font-size: 0.95rem;
+        margin-top: 5px;
+      }
+      
+      .alternative-plans-card .recommendation {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #f2d7d5;
+        font-weight: 600;
+        color: #3498db;
+      }
+
+      .user-message {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 5px;
+      }
+
+      .typing-indicator {
+        display: flex;
+        padding: 12px 15px;
+        background: #f1f0f0;
+        border-radius: 18px;
+        align-self: flex-start;
+        margin-bottom: 10px;
+        width: 60px;
+        justify-content: center;
+        display: none;
+      }
+
+      .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        background: #888;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 2px;
+        animation: typing 1s infinite ease-in-out;
+      }
+
+      .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typing {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .chat-input-container {
+        padding: 15px;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 10px;
+      }
+
+      .chat-input {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        padding: 10px 15px;
+        font-size: 0.95rem;
+        outline: none;
+      }
+
+      .chat-input:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+      }
+
+      .chat-send {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .chat-send:hover {
+        background: linear-gradient(135deg, #2980b9, #3498db);
+      }
+
+      .chat-send i {
+        font-size: 18px;
+      }
+
+      .option-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 5px;
+      }
+
+      .option-button {
+        background: #e1f0fa;
+        color: #3498db;
+        border: 1px solid #bde0fd;
+        border-radius: 15px;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .option-button:hover {
+        background: #d0e8f7;
+        border-color: #3498db;
+      }
+
+      /* Debug button style */
+      .debug-button {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        z-index: 9999;
+        padding: 10px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🛡️ Travel Insurance Assistant</h1>
+        <p>AI-powered assistant for Bajaj Allianz Travel Ace policies</p>
+      </div>
+
+      <div class="main-content">
+        <!-- Available Plans Section -->
+        <div class="section" id="available-plans-section">
+          <!-- <h2>Available Travel Plans</h2>
+                <button class="btn btn-success" onclick="loadAvailablePlans()">
+                    View All Available Plans
+                </button> -->
+          <div
+            class="available-plans"
+            id="available-plans"
+            style="display: none"
+          >
+            <div id="plans-content">Loading plans...</div>
+          </div>
+        </div>
+
+        <!-- Plan Selection Section -->
+        <div class="section" id="plan-selection">
+          <h2>Select Your Travel Plan</h2>
+          <div class="plans-section">
+            <div class="plan-input-group">
+              <input
+                type="text"
+                id="plan-input"
+                class="plan-input"
+                placeholder="Enter plan name (e.g., Travel Ace Standard, Travel Ace Gold, Travel Ace Platinum...)"
+              />
+              <div class="plan-suggestions" id="plan-suggestions"></div>
+            </div>
+            <button class="btn" onclick="selectPlan()">Select Plan</button>
+          </div>
+        </div>
+
+        <!-- Selected Plan Info -->
+        <div class="selected-plan-info" id="selected-plan-info">
+          <h3 id="selected-plan-name">Plan Selected</h3>
+          <div class="plan-details" id="selected-plan-details"></div>
+        </div>
+
+        <!-- Query Section -->
+        <div class="query-section" id="query-section">
+          <h2>Ask Questions About Your Plan</h2>
+
+          <!-- Quick Questions -->
+          <div class="quick-questions">
+            <h4>💡 Quick Questions:</h4>
+            <span
+              class="quick-question-btn"
+              onclick="askQuickQuestion('What is the coverage amount for laptop in this plan?')"
+            >
+              Laptop Coverage
+            </span>
+            <span
+              class="quick-question-btn"
+              onclick="askQuickQuestion('What are the medical coverage limits?')"
+            >
+              Medical Coverage
+            </span>
+            <span
+              class="quick-question-btn"
+              onclick="askQuickQuestion('What is the premium for 30 days travel to USA?')"
+            >
+              Premium Rates
+            </span>
+            <span
+              class="quick-question-btn"
+              onclick="askQuickQuestion('What are the exclusions in this plan?')"
+            >
+              Exclusions
+            </span>
+            <span
+              class="quick-question-btn"
+              onclick="askQuickQuestion('What documents are needed for claims?')"
+            >
+              Claim Documents
+            </span>
+            <span
+              class="quick-question-btn"
+              onclick="askQuickQuestion('Is pre-existing illness covered?')"
+            >
+              Pre-existing Illness
+            </span>
+          </div>
+
+          <div class="query-input-group">
+            <textarea
+              id="question-input"
+              class="query-input"
+              placeholder="Ask me anything about your selected plan... "
+            ></textarea>
+          </div>
+          <button class="btn" id="ask-btn" onclick="askQuestion()">
+            Ask Question
+          </button>
+          <button
+            class="btn btn-secondary"
+            id="reset-btn"
+            onclick="resetPlan()"
+          >
+            Change Plan
+          </button>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Processing your question...</p>
+        </div>
+
+        <!-- Answer Section -->
+        <div class="answer-section" id="answer-section">
+          <h3>Answer:</h3>
+          <div class="answer-text" id="answer-text"></div>
+          <div class="sources" id="sources-section">
+            <h4>📚 Sources:</h4>
+            <div id="sources-list"></div>
+          </div>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div class="error" id="error-message"></div>
+        <div class="success" id="success-message"></div>
+      </div>
+    </div>
+
+    <!-- Improved Chatbot Icon with direct onclick handler -->
+    <div
+      class="chatbot-icon"
+      id="chatbot-icon"
+      onclick="document.getElementById('chat-popup').classList.add('show')"
+    >
+      <i class="fas fa-comment"></i>
+    </div>
+
+    <div class="chat-popup" id="chat-popup">
+      <div class="chat-header">
+        <h3>Travel Plan Assistant</h3>
+        <span
+          class="chat-close"
+          id="chat-close"
+          onclick="document.getElementById('chat-popup').classList.remove('show')"
+          >&times;</span
+        >
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <!-- Messages will appear here -->
+      </div>
+      <div class="typing-indicator" id="typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="chat-input-container">
+        <input
+          type="text"
+          class="chat-input"
+          id="chat-input"
+          placeholder="Type a message..."
+        />
+        <button class="chat-send" id="chat-send">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let selectedPlan = null;
+      let availablePlans = [];
+
+      // Plan name suggestions
+      const planSuggestions = [
+        "Travel Ace Standard",
+        "Travel Ace Silver",
+        "Travel Ace Gold",
+        "Travel Ace Platinum",
+        "Travel Ace Super Age",
+        "Travel Ace Corporate Lite",
+        "Travel Ace Corporate Plus",
+      ];
+
+      // Load page and check current plan
+      document.addEventListener("DOMContentLoaded", function () {
+        checkCurrentPlan();
+        setupPlanInput();
+      });
+
+      function setupPlanInput() {
+        const planInput = document.getElementById("plan-input");
+        const suggestions = document.getElementById("plan-suggestions");
+
+        planInput.addEventListener("input", function () {
+          const value = this.value.toLowerCase();
+          if (value.length > 0) {
+            const filtered = planSuggestions.filter((plan) =>
+              plan.toLowerCase().includes(value)
+            );
+
+            if (filtered.length > 0) {
+              suggestions.innerHTML = filtered
+                .map(
+                  (plan) =>
+                    `<div class="plan-suggestion" onclick="selectSuggestion('${plan}')">${plan}</div>`
+                )
+                .join("");
+              suggestions.style.display = "block";
+            } else {
+              suggestions.style.display = "none";
+            }
+          } else {
+            suggestions.style.display = "none";
+          }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener("click", function (e) {
+          if (
+            !planInput.contains(e.target) &&
+            !suggestions.contains(e.target)
+          ) {
+            suggestions.style.display = "none";
+          }
+        });
+      }
+
+      function selectSuggestion(plan) {
+        document.getElementById("plan-input").value = plan;
+        document.getElementById("plan-suggestions").style.display = "none";
+      }
+
+      async function loadAvailablePlans() {
+        try {
+          showLoading(true, "Loading available plans...");
+
+          const response = await fetch("/api/plans");
+          const data = await response.json();
+
+          if (data.success) {
+            const plansDiv = document.getElementById("available-plans");
+            const plansContent = document.getElementById("plans-content");
+
+            plansContent.innerHTML = `<div style="white-space: pre-wrap;">${data.plans_info}</div>`;
+            plansDiv.style.display = "block";
+
+            showSuccess("Plans loaded successfully!");
+          } else {
+            showError("Failed to load plans: " + data.message);
+          }
+        } catch (error) {
+          showError("Error loading plans: " + error.message);
+        } finally {
+          showLoading(false);
+        }
+      }
+
+      async function selectPlan() {
+        const planName = document.getElementById("plan-input").value.trim();
+
+        if (!planName) {
+          showError("Please enter a plan name");
+          return;
+        }
+
+        try {
+          showLoading(true, "Selecting plan and loading details...");
+
+          const response = await fetch("/api/select-plan", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ plan_name: planName }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            selectedPlan = data.selected_plan;
+            updateSelectedPlan(data);
+            showSuccess(data.message);
+            showQuerySection();
+          } else {
+            showError("Failed to select plan: " + data.message);
+          }
+        } catch (error) {
+          showError("Error selecting plan: " + error.message);
+        } finally {
+          showLoading(false);
+        }
+      }
+
+      function updateSelectedPlan(data) {
+        const selectedPlanInfo = document.getElementById("selected-plan-info");
+        const selectedPlanName = document.getElementById("selected-plan-name");
+        const selectedPlanDetails = document.getElementById(
+          "selected-plan-details"
+        );
+
+        selectedPlanName.textContent = `✅ ${data.selected_plan}`;
+        selectedPlanDetails.innerHTML = `
+                <div style="white-space: pre-wrap; margin-bottom: 20px;">${
+                  data.plan_details
+                }</div>
+                ${
+                  data.sources && data.sources.length > 0
+                    ? `
+                <div style="border-top: 1px solid #e1e8ed; padding-top: 15px;">
+                    <h4 style="color: #7f8c8d; margin-bottom: 10px;">📄 Sources:</h4>
+                    ${data.sources
+                      .map(
+                        (source) => `
+                        <div style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">
+                            • ${source.document} (Page ${source.page})
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+                `
+                    : ""
+                }
+            `;
+
+        selectedPlanInfo.classList.add("show");
+      }
+
+      function showQuerySection() {
+        document.getElementById("query-section").classList.add("show");
+      }
+
+      function askQuickQuestion(question) {
+        document.getElementById("question-input").value = question;
+        askQuestion();
+      }
+
+      async function askQuestion() {
+        const questionInput = document.getElementById("question-input");
+        const question = questionInput.value.trim();
+
+        if (!question) {
+          showError("Please enter a question");
+          return;
+        }
+
+        if (!selectedPlan) {
+          showError("Please select a plan first");
+          return;
+        }
+
+        try {
+          showLoading(true, "Processing your question...");
+          hideMessages();
+
+          const response = await fetch("/api/query", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ question: question }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showAnswer(data);
+          } else {
+            showError("Failed to get answer: " + data.message);
+          }
+        } catch (error) {
+          showError("Error processing question: " + error.message);
+        } finally {
+          showLoading(false);
+        }
+      }
+
+      async function askGeneralQuestion() {
+        const questionInput = document.getElementById("general-question-input");
+        const question = questionInput.value.trim();
+
+        if (!question) {
+          showError("Please enter a question");
+          return;
+        }
+
+        try {
+          showLoading(true, "Processing your general question...");
+          hideMessages();
+
+          const response = await fetch("/api/general-query", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ question: question }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showAnswer(data);
+          } else {
+            showError("Failed to get answer: " + data.message);
+          }
+        } catch (error) {
+          showError("Error processing question: " + error.message);
+        } finally {
+          showLoading(false);
+        }
+      }
+
+      function showAnswer(data) {
+        const answerSection = document.getElementById("answer-section");
+        const answerText = document.getElementById("answer-text");
+        const sourcesList = document.getElementById("sources-list");
+
+        answerText.textContent = data.answer;
+
+        // Show sources
+        sourcesList.innerHTML = "";
+        if (data.sources && data.sources.length > 0) {
+          data.sources.forEach((source) => {
+            const sourceItem = document.createElement("div");
+            sourceItem.className = "source-item";
+            sourceItem.innerHTML = `
+                        <div class="source-meta">
+                            📄 ${source.document} - Page ${source.page} ${
+              source.content_type ? `(${source.content_type})` : ""
+            }
+                        </div>
+                        <div class="source-content">
+                            "${source.content_preview}"
+                        </div>
+                    `;
+            sourcesList.appendChild(sourceItem);
+          });
+        } else {
+          sourcesList.innerHTML =
+            '<p style="color: #7f8c8d; font-style: italic;">No specific sources available</p>';
+        }
+
+        answerSection.classList.add("show");
+        answerSection.scrollIntoView({ behavior: "smooth" });
+      }
+
+      async function resetPlan() {
+        try {
+          const response = await fetch("/api/reset-plan", {
+            method: "POST",
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            selectedPlan = null;
+
+            // Reset UI
+            document
+              .getElementById("selected-plan-info")
+              .classList.remove("show");
+            document.getElementById("query-section").classList.remove("show");
+            document.getElementById("answer-section").classList.remove("show");
+            document.getElementById("question-input").value = "";
+            document.getElementById("plan-input").value = "";
+            document.getElementById("general-question-input").value = "";
+
+            hideMessages();
+            showSuccess("Plan selection reset. Please choose a new plan.");
+
+            // Scroll to top
+            document
+              .getElementById("plan-selection")
+              .scrollIntoView({ behavior: "smooth" });
+          } else {
+            showError("Failed to reset plan: " + data.message);
+          }
+        } catch (error) {
+          showError("Error resetting plan: " + error.message);
+        }
+      }
+
+      async function checkCurrentPlan() {
+        try {
+          const response = await fetch("/api/current-plan");
+          const data = await response.json();
+
+          if (data.success) {
+            selectedPlan = data.selected_plan;
+            document.getElementById("plan-input").value = data.selected_plan;
+
+            // Get plan details
+            const planResponse = await fetch("/api/select-plan", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ plan_name: data.selected_plan }),
+            });
+
+            const planData = await planResponse.json();
+            if (planData.success) {
+              updateSelectedPlan(planData);
+              showQuerySection();
+            }
+          }
+        } catch (error) {
+          // Ignore errors - user hasn't selected a plan yet
+        }
+      }
+
+      function showLoading(show, message = "Processing your question...") {
+        const loading = document.getElementById("loading");
+        const askBtn = document.getElementById("ask-btn");
+
+        if (show) {
+          loading.classList.add("show");
+          loading.querySelector("p").textContent = message;
+          if (askBtn) {
+            askBtn.disabled = true;
+            askBtn.textContent = "Processing...";
+          }
+        } else {
+          loading.classList.remove("show");
+          if (askBtn) {
+            askBtn.disabled = false;
+            askBtn.textContent = "Ask Question";
+          }
+        }
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("error-message");
+        errorDiv.textContent = message;
+        errorDiv.classList.add("show");
+
+        setTimeout(() => {
+          errorDiv.classList.remove("show");
+        }, 5000);
+      }
+
+      function showSuccess(message) {
+        const successDiv = document.getElementById("success-message");
+        successDiv.textContent = message;
+        successDiv.classList.add("show");
+
+        setTimeout(() => {
+          successDiv.classList.remove("show");
+        }, 3000);
+      }
+
+      function hideMessages() {
+        document.getElementById("error-message").classList.remove("show");
+        document.getElementById("success-message").classList.remove("show");
+      }
+
+      // Allow Enter key to submit question (Shift+Enter for new line)
+      document
+        .getElementById("question-input")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            askQuestion();
+          }
+        });
+
+      // Plan input enter key
+      document
+        .getElementById("plan-input")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            selectPlan();
+          }
+        });
+
+      // IMPROVED CHATBOT FUNCTIONALITY
+      // Initialize the chatbot functionality when the page loads
+      let chatbotInitialized = false;
+
+      function initializeChatbot() {
+        if (chatbotInitialized) return; // Prevent multiple initializations
+
+        const chatbotIcon = document.getElementById("chatbot-icon");
+        const chatPopup = document.getElementById("chat-popup");
+        const chatClose = document.getElementById("chat-close");
+        const chatMessages = document.getElementById("chat-messages");
+        const chatInput = document.getElementById("chat-input");
+        const chatSend = document.getElementById("chat-send");
+        const typingIndicator = document.getElementById("typing-indicator");
+
+        // Make sure all elements exist
+        if (
+          !chatbotIcon ||
+          !chatPopup ||
+          !chatClose ||
+          !chatMessages ||
+          !chatInput ||
+          !chatSend
+        ) {
+          console.error("Chatbot elements not found");
+          return;
+        }
+
+        let conversationState = "initial";
+        let userAnswers = {
+          destination: "",
+          duration: "",
+          age: "",
+          coverage: "",
+        };
+
+        // Open chat popup - add a direct click handler
+        chatbotIcon.onclick = function () {
+          console.log("Chatbot icon clicked"); // Debug log
+          chatPopup.classList.add("show");
+
+          // If this is the first time opening, show welcome message
+          if (chatMessages.children.length === 0) {
+            setTimeout(() => {
+              addBotMessage(
+                "👋 Hi there! I'm your Travel Insurance Assistant. How can I help you today?"
+              );
+            }, 500);
+          }
+        };
+
+        // Close chat popup
+        chatClose.onclick = function () {
+          chatPopup.classList.remove("show");
+        };
+
+        // Send message on button click
+        chatSend.onclick = sendMessage;
+
+        // Send message on Enter key
+        chatInput.onkeydown = function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+          }
+        };
+
+        // Function to send user message
+        function sendMessage() {
+          const message = chatInput.value.trim();
+          if (!message) return;
+
+          // Add user message to chat
+          addUserMessage(message);
+          chatInput.value = "";
+
+          // Show typing indicator
+          showTypingIndicator(true);
+
+          // Process the message
+          setTimeout(() => {
+            processUserMessage(message);
+            showTypingIndicator(false);
+          }, 1000);
+        }
+
+        // Function to process user messages and determine responses
+        function processUserMessage(message) {
+          // First message greeting
+          if (
+            conversationState === "initial" &&
+            message.toLowerCase().includes("hi")
+          ) {
+            addBotMessage(
+              "I am an assistant to help you choose your travel plan. Let me ask you a few questions to find the best plan for you."
+            );
+            setTimeout(() => {
+              askDestination();
+            }, 1000);
+            return;
+          }
+          
+          // Check if user doesn't like the plan and wants alternatives
+          if (
+            conversationState === "plan_selected" &&
+            (message.toLowerCase().includes("don't like") || 
+             message.toLowerCase().includes("dont like") ||
+             message.toLowerCase().includes("other plan") ||
+             message.toLowerCase().includes("alternative") ||
+             message.toLowerCase().includes("different plan") ||
+             message.toLowerCase().includes("another plan") ||
+             message.toLowerCase().includes("suggest"))
+          ) {
+            showAlternativePlans();
+            return;
+          }
+
+          // Process based on conversation state
+          switch (conversationState) {
+            case "initial":
+              addBotMessage(
+                "I am an assistant to help you choose your travel plan. Let me ask you a few questions to find the best plan for you."
+              );
+              setTimeout(() => {
+                askDestination();
+              }, 1000);
+              break;
+
+            case "asking_destination":
+              userAnswers.destination = message;
+              addBotMessage(`Great! You're traveling to ${message}.`);
+              setTimeout(() => {
+                askDuration();
+              }, 1000);
+              break;
+
+            case "asking_duration":
+              userAnswers.duration = message;
+              addBotMessage(`Got it. Your trip duration is ${message}.`);
+              setTimeout(() => {
+                askAge();
+              }, 1000);
+              break;
+
+            case "asking_age":
+              userAnswers.age = message;
+              addBotMessage(
+                `Thank you for sharing that you're ${message} years old.`
+              );
+              setTimeout(() => {
+                askCoverage();
+              }, 1000);
+              break;
+
+            case "asking_coverage":
+              userAnswers.coverage = message;
+              addBotMessage("Thank you for providing all the information!");
+              setTimeout(() => {
+                recommendPlan();
+              }, 1000);
+              break;
+
+            case "plan_selected":
+              // Handle follow-up questions about the selected plan
+              sendToChatbotAPI(message);
+              break;
+
+            default:
+              sendToChatbotAPI(message);
+          }
+        }
+
+        // Function to show alternative plans when user is not satisfied
+        function showAlternativePlans() {
+          // Get currently selected plan to exclude from alternatives
+          const currentPlan = userAnswers.selectedPlan || "Travel Ace Standard";
+          
+          // Sample alternative plans message - in a real app, this would come from the API
+          const alternativesMessage = `
+            Based on the user's objection regarding the ${currentPlan} plan, which offers coverage of USD 50,000, we can analyze the available alternatives that provide higher coverage while still being suitable for travel insurance needs. ### Alternative Plans to Consider: | Plan Name | Coverage Amount | Deductible Age Range | Personal Accident Coverage | Lifestyle Modification Benefit | Child Education Benefit | |------------|----------------|---------------------|------------------------------|--------------------------------|------------------------|
+            ----------------------------------------
+            **Travel Ace Silver** | USD 100,000 | 0-70 yrs | USD 12,000 | USD 5,000 | USD 3,000 |
+            **Travel Ace Gold** | USD 200,000 | 0-70 yrs | USD 15,000 | USD 6,000 | USD 4,000 |
+            **Travel Ace Platinum** | USD 500,000 | 0-70 yrs | USD 25,000 | USD 10,000 | USD 8,000 |
+            **Travel Ace Corporate Lite** | USD 250,000 | 0-70 yrs | USD 15,000 | USD 5,000 | Optional |
+            **Travel Ace Corporate Plus** | USD 500,000 | 0-70 yrs | USD 10,000 | Optional | Optional |
+            ### Recommendation: **Travel Ace Silver** - This plan offers a significant increase in coverage to USD 100,000, which may better suit your needs.
+          `;
+          
+          // Add the alternatives message to chat
+          addBotMessage(alternativesMessage);
+          
+          // Offer buttons to select a new plan
+          setTimeout(() => {
+            addBotMessage("Would you like to select one of these alternative plans?", [
+              "Travel Ace Silver",
+              "Travel Ace Gold",
+              "Travel Ace Platinum",
+              "Keep current plan"
+            ]);
+          }, 1000);
+        }
+
+        // Ask for destination
+        function askDestination() {
+          conversationState = "asking_destination";
+          addBotMessage(
+            "Where are you planning to travel? (e.g., USA, Europe, Asia)"
+          );
+        }
+
+        // Ask for duration
+        function askDuration() {
+          conversationState = "asking_duration";
+          addBotMessage(
+            "How long will your trip be? (e.g., 7 days, 2 weeks, 1 month)"
+          );
+        }
+
+        // Ask for age
+        function askAge() {
+          conversationState = "asking_age";
+          addBotMessage(
+            "What is your age? This helps us find age-appropriate coverage."
+          );
+        }
+
+        // Ask about coverage preferences
+        function askCoverage() {
+          conversationState = "asking_coverage";
+          addBotMessage("What's most important to you in travel insurance?", [
+            "Medical coverage",
+            "Trip cancellation",
+            "Baggage protection",
+            "Adventure activities",
+            "All of the above",
+          ]);
+        }
+
+        // Recommend a plan based on user inputs
+        function recommendPlan() {
+          conversationState = "plan_selected";
+
+          // Analyze user answers to recommend a plan
+          let recommendedPlan = "";
+
+          // Simple logic for plan recommendation
+          if (
+            userAnswers.destination.toLowerCase().includes("usa") ||
+            userAnswers.destination.toLowerCase().includes("europe")
+          ) {
+            if (parseInt(userAnswers.age) > 60) {
+              recommendedPlan = "Travel Ace Super Age";
+            } else if (userAnswers.coverage.toLowerCase().includes("all")) {
+              recommendedPlan = "Travel Ace Platinum";
+            } else {
+              recommendedPlan = "Travel Ace Gold";
+            }
+          } else {
+            if (
+              userAnswers.duration.includes("week") ||
+              parseInt(userAnswers.duration) <= 14
+            ) {
+              recommendedPlan = "Travel Ace Standard";
+            } else {
+              recommendedPlan = "Travel Ace Silver";
+            }
+          }
+          
+          // Store the selected plan
+          userAnswers.selectedPlan = recommendedPlan;
+
+          // Send the recommendation to the API to get plan details
+          fetch("/chatbot/get_plan_details", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ plan_name: recommendedPlan }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                addBotMessage(
+                  `Based on your requirements, I recommend the <strong>${recommendedPlan}</strong> plan.`
+                );
+
+                setTimeout(() => {
+                  addBotMessage(
+                    `<strong>Plan Details:</strong><br>${formatPlanDetailsForDisplay(data.plan_details)}`
+                  );
+                }, 1000);
+
+                setTimeout(() => {
+                  addBotMessage(
+                    "Would you like to select this plan, or do you have any questions about it?",
+                    [
+                      "Select this plan",
+                      "Tell me more about coverage",
+                      "Show me other options",
+                    ]
+                  );
+                }, 2000);
+              } else {
+                addBotMessage(
+                  "I'm having trouble retrieving plan details. Please try again later."
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              addBotMessage(
+                "I'm having trouble retrieving plan details. Please try again later."
+              );
+            });
+        }
+
+        // Send message to chatbot API
+        function sendToChatbotAPI(message) {
+          fetch("/chatbot/message", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: message }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                addBotMessage(data.response);
+
+                // If options are provided, show them
+                if (data.options && data.options.length > 0) {
+                  setTimeout(() => {
+                    addBotMessage("You might want to consider:", data.options);
+                  }, 500);
+                }
+              } else {
+                addBotMessage(
+                  "I'm sorry, I'm having trouble understanding. Could you try rephrasing your question?"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              addBotMessage(
+                "I'm sorry, there was an error processing your request. Please try again later."
+              );
+            });
+        }
+
+        // Add a bot message to the chat
+        function addBotMessage(message, options = []) {
+          const messageElement = document.createElement("div");
+          
+          // Check if the message contains Plan Details heading
+          if (message.includes("<strong>Plan Details:</strong>")) {
+            messageElement.className = "plan-details-card";
+            
+            // Format the plan details in a more structured way
+            const parts = message.split("<br>");
+            const heading = parts[0];
+            
+            // Clean up any remaining parts and join them
+            const details = parts.slice(1).join("")
+              .replace(/\*\*/g, '') // Remove ** markdown
+              .replace(/•+/g, '•') // Normalize bullet points
+              .trim();
+            
+            // Create a more structured format
+            messageElement.innerHTML = `
+              <h3>${heading}</h3>
+              <div class="plan-details-content">
+                ${formatPlanDetails(details)}
+              </div>
+            `;
+          } 
+          // Check if message contains alternative plans
+          else if (message.includes("Alternative Plans to Consider:")) {
+            messageElement.className = "alternative-plans-card";
+            
+            // Format the alternative plans in a structured way
+            const formattedContent = formatAlternativePlans(message);
+            messageElement.innerHTML = formattedContent;
+          } 
+          else {
+            messageElement.className = "message bot-message";
+            messageElement.innerHTML = message;
+          }
+          
+          chatMessages.appendChild(messageElement);
+
+          // Add option buttons if provided
+          if (options.length > 0) {
+            const optionsContainer = document.createElement("div");
+            optionsContainer.className = "option-buttons";
+
+            options.forEach((option) => {
+              const button = document.createElement("button");
+              button.className = "option-button";
+              button.textContent = option;
+              button.addEventListener("click", function () {
+                addUserMessage(option);
+                showTypingIndicator(true);
+                setTimeout(() => {
+                  processUserMessage(option);
+                  showTypingIndicator(false);
+                }, 1000);
+              });
+              optionsContainer.appendChild(button);
+            });
+
+            chatMessages.appendChild(optionsContainer);
+          }
+
+          scrollToBottom();
+        }
+
+        // Add a user message to the chat
+        function addUserMessage(message) {
+          const messageElement = document.createElement("div");
+          messageElement.className = "message user-message";
+          messageElement.textContent = message;
+          chatMessages.appendChild(messageElement);
+          scrollToBottom();
+        }
+
+        // Show or hide typing indicator
+        function showTypingIndicator(show) {
+          typingIndicator.style.display = show ? "flex" : "none";
+          if (show) {
+            scrollToBottom();
+          }
+        }
+
+        // Scroll chat to bottom
+        function scrollToBottom() {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Helper function to format plan details
+        function formatPlanDetails(detailsText) {
+          // First clean up hash symbols
+          let cleanText = detailsText.replace(/#+\s*/g, '');
+          
+          // Replace key sections with styled elements
+          const formattedText = cleanText
+            .replace(/(\w[\w\s\-\(\)]+):\s*([^:]+?)(?=\s*\w[\w\s\-\(\)]+:|$)/g, 
+              '<div class="detail-item"><span class="detail-category">$1</span><span class="detail-value">$2</span></div>');
+          
+          return formattedText;
+        }
+        
+        // Helper function to format alternative plans
+        function formatAlternativePlans(message) {
+          // Remove hash symbols and normalize spacing
+          let cleanText = message
+            .replace(/#+\s*/g, '')
+            .replace(/\|\s*Plan Name/g, 'Plan Name') // Remove pipe symbols
+            .replace(/\|/g, '') // Remove remaining pipe symbols
+            .replace(/---+/g, ''); // Remove divider lines
+          
+          // Split into intro and plans list
+          const splitPoint = cleanText.indexOf("Alternative Plans to Consider:");
+          const intro = cleanText.substring(0, splitPoint + "Alternative Plans to Consider:".length);
+          const plansText = cleanText.substring(splitPoint + "Alternative Plans to Consider:".length);
+          
+          // Process plans text to identify individual plans
+          const planPatterns = [
+            "**Travel Ace Silver**",
+            "**Travel Ace Gold**",
+            "**Travel Ace Platinum**",
+            "**Travel Ace Super Age**",
+            "**Travel Ace Corporate Lite**",
+            "**Travel Ace Corporate Plus**"
+          ];
+          
+          let planSections = [];
+          let currentIndex = 0;
+          
+          planPatterns.forEach((pattern, index) => {
+            const planStart = plansText.indexOf(pattern);
+            if (planStart !== -1) {
+              const nextPlanIndex = index < planPatterns.length - 1 ? 
+                plansText.indexOf(planPatterns[index + 1]) : plansText.length;
+              
+              if (nextPlanIndex !== -1) {
+                const planSection = plansText.substring(planStart, nextPlanIndex).trim();
+                planSections.push(planSection);
+                currentIndex = nextPlanIndex;
+              }
+            }
+          });
+          
+          // Find recommendation section
+          const recommendationStart = plansText.indexOf("Recommendation:");
+          let recommendation = "";
+          if (recommendationStart !== -1) {
+            recommendation = plansText.substring(recommendationStart).trim();
+          }
+          
+          // Format each plan
+          const formattedPlans = planSections.map(plan => {
+            // Get plan name
+            const nameEndIndex = plan.indexOf(" |");
+            const nameEndIndex2 = plan.indexOf(" USD");
+            const nameEnd = nameEndIndex !== -1 ? nameEndIndex : (nameEndIndex2 !== -1 ? nameEndIndex2 : plan.length);
+            const planName = plan.substring(0, nameEnd).replace(/\*\*/g, '').trim();
+            
+            // Get plan details
+            const planDetails = plan.substring(nameEnd).trim()
+              .replace(/\*\*/g, '') // Remove ** markdown
+              .replace(/•+/g, '•'); // Normalize bullet points
+              
+            return `
+              <div class="plan-option">
+                <div class="plan-name">${planName}</div>
+                <div class="plan-details">${planDetails}</div>
+              </div>
+            `;
+          }).join('');
+          
+          // Format recommendation
+          let formattedRecommendation = "";
+          if (recommendation) {
+            formattedRecommendation = `
+              <div class="recommendation">
+                ${recommendation.replace("Recommendation:", "<strong>Recommendation:</strong>")}
+              </div>
+            `;
+          }
+          
+          // Build the complete HTML
+          return `
+            <div class="plans-intro">${intro}</div>
+            <div class="plans-list">
+              ${formattedPlans}
+            </div>
+            ${formattedRecommendation}
+          `;
+        }
+        
+        // Helper function to format plan details for display
+        function formatPlanDetailsForDisplay(detailsText) {
+          // Clean up hash symbols and any existing formatting
+          let cleanText = detailsText
+            .replace(/#+\s*/g, '')
+            .replace(/<br\s*\/?>/gi, '\n');
+          
+          // Split into lines and format key-value pairs
+          const lines = cleanText.split('\n');
+          const formattedLines = lines.map(line => {
+            // Check if line has a key-value format (contains a colon)
+            if (line.includes(':')) {
+              const [key, value] = line.split(':', 2);
+              return `${key.trim()}: ${value.trim()}`;
+            }
+            return line;
+          });
+          
+          return formattedLines.join('\n');
+        }
+
+        chatbotInitialized = true;
+        console.log("Chatbot initialized successfully");
+      }
+
+      // Run the initialization as soon as possible
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializeChatbot);
+      } else {
+        // DOMContentLoaded has already fired
+        initializeChatbot();
+      }
+
+      // Add a backup initialization after a short delay
+      setTimeout(initializeChatbot, 1000);
+
+      // Remove any global reference to showAlternativePlans that might be causing conflicts
+      window.showAlternativePlans = null;
+
+      // Make the chatbot icon extra clickable with a direct onclick
+      window.addEventListener("load", function () {
+        const chatbotIcon = document.getElementById("chatbot-icon");
+        if (chatbotIcon) {
+          chatbotIcon.onclick = function () {
+            console.log("Chatbot icon clicked via window.load handler");
+            document.getElementById("chat-popup").classList.add("show");
+
+            // If this is the first time opening, show welcome message
+            const chatMessages = document.getElementById("chat-messages");
+            if (chatMessages && chatMessages.children.length === 0) {
+              setTimeout(() => {
+                const messageElement = document.createElement("div");
+                messageElement.className = "message bot-message";
+                messageElement.innerHTML =
+                  "👋 Hi there! I'm your Travel Insurance Assistant. How can I help you today?";
+                chatMessages.appendChild(messageElement);
+              }, 500);
+            }
+          };
+        }
+      });
+    </script>
+  </body>
+</html>
