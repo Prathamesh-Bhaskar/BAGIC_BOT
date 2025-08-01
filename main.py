@@ -17,7 +17,7 @@ import re
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here-change-this'  # Change this in production
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your-secret-key-here-change-this')  # Get from env or use default
 
 # Global RAG system instance (this will be shared with the chatbot)
 rag_system = None
@@ -25,24 +25,30 @@ rag_system = None
 class TravelInsuranceRAG:
     def __init__(self):
         # Astra DB configuration
-        self.ASTRA_DB_APPLICATION_TOKEN = ""
-        self.ASTRA_DB_API_ENDPOINT = ""
-        self.COLLECTION_NAME = ""  # New version for table-aware processing
+        self.ASTRA_DB_APPLICATION_TOKEN = os.environ.get("ASTRA_DB_APPLICATION_TOKEN", "")
+        self.ASTRA_DB_API_ENDPOINT = os.environ.get("ASTRA_DB_API_ENDPOINT", "")
+        self.COLLECTION_NAME = os.environ.get("ASTRA_DB_COLLECTION_NAME", "")  # New version for table-aware processing
         
         # Azure OpenAI Configuration
-        self.AZURE_ENDPOINT = ""
-        self.AZURE_MODEL_NAME = ""
-        self.AZURE_DEPLOYMENT = ""
-        self.AZURE_API_KEY = ""
-        self.AZURE_API_VERSION = ""
+        self.AZURE_ENDPOINT = os.environ.get("AZURE_ENDPOINT", "")
+        self.AZURE_MODEL_NAME = os.environ.get("AZURE_MODEL_NAME", "")
+        self.AZURE_DEPLOYMENT = os.environ.get("AZURE_DEPLOYMENT", "")
+        self.AZURE_API_KEY = os.environ.get("AZURE_API_KEY", "")
+        self.AZURE_API_VERSION = os.environ.get("AZURE_API_VERSION", "")
         
-        # Document paths
-        self.PDF_FILES = [
-            "Travel-Ace-PF.pdf",
-            "Travel-Ace-Policy-brochure.pdf",
-            # "Travel-Ace-Policy-Wordings.pdf",
-            # "trave;-ace-int-cies.pdf"
-        ]
+        # Document paths from environment or use defaults
+        pdf_files_env = os.environ.get("PDF_FILES", "")
+        if pdf_files_env:
+            # Split by comma if provided as comma-separated list
+            self.PDF_FILES = [file.strip() for file in pdf_files_env.split(",")]
+        else:
+            # Default PDF files if not specified in environment
+            self.PDF_FILES = [
+                "Travel-Ace-PF.pdf",
+                "Travel-Ace-Policy-brochure.pdf",
+                # "Travel-Ace-Policy-Wordings.pdf",
+                # "trave;-ace-int-cies.pdf"
+            ]
         
         # Initialize components
         self.embeddings = None
@@ -887,6 +893,6 @@ if __name__ == '__main__':
         app.register_blueprint(chatbot_bp, url_prefix='/chatbot')
         
         print("🚀 Starting Flask application with enhanced RAG capabilities and chatbot...")
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        app.run(debug=True, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
     else:
         print("❌ Failed to start application due to Enhanced RAG system initialization error")
